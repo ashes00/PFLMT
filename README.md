@@ -1,10 +1,10 @@
-## IP List Manager
+## PFLMT (Portable Friendly List Modification Tool)
 
 <p align="center">
   <img src="./images/screen.jpeg" alt="PFLMT Screenshot" width="50%" style="max-width: 100%; height: auto;">
 </p>
 
-This is a simple, single-file PHP web application for managing lists of IP addresses, CIDR blocks, and comments stored in plain text files.
+**PFLMT (Portable Friendly List Modification Tool)** is a simple, single-file PHP web application for managing lists of IP addresses, CIDR blocks, and comments stored in plain text files.
 
 ### Requirements
 
