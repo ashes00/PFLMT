@@ -1,7 +1,7 @@
 ## IP List Manager
 
 <p align="center">
-  <img src="./images/screen.jpeg" alt="PFLMT Screenshot" width="500" height="500" style="max-width: 100%; height: auto;">
+  <img src="./images/screen.jpeg" alt="PFLMT Screenshot" width="50%" style="max-width: 100%; height: auto;">
 </p>
 
 This is a simple, single-file PHP web application for managing lists of IP addresses, CIDR blocks, and comments stored in plain text files.
