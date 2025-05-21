@@ -66,19 +66,26 @@ function get_list_ips($dir, $list_name) {
         return false; // List doesn't exist or cannot be read
     }
 
-    $content = file_get_contents($file_path);
-    if ($content === false) {
+    $file_content = file_get_contents($file_path);
+    if ($file_content === false) {
         error_log("Error: Could not read list file content: " . $file_path);
         return []; // Handle file read error, return empty array
     }
 
-    $ips = explode("\n", $content);
-    // Return raw lines, preserving order and content, including empty lines if present between entries.
-    // Filter out the very last line if it's empty, which often results from the final newline in the file.
-    if (count($ips) > 0 && end($ips) === '') {
-        array_pop($ips);
+    $lines = explode("\n", $file_content);
+
+    // Check for and remove our specific timestamp header if present
+    // The regex matches "# Last updated: YYYY-MM-DD HH:MM:SS UTC"
+    if (count($lines) > 0 && preg_match('/^# Last updated: \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC$/', $lines[0])) {
+        array_shift($lines); // Remove the first element (the timestamp line)
     }
-    return $ips;
+
+    // Filter out the very last line if it's empty, which often results from the final newline in the file.
+    // This needs to be done after potentially removing the header.
+    if (count($lines) > 0 && end($lines) === '') {
+        array_pop($lines);
+    }
+    return $lines; // These are the actual entries, excluding the timestamp
 }
 
 /**
@@ -95,16 +102,24 @@ function save_list_entries($dir, $list_name, $entries_array) {
     }
     $file_path = $dir . $list_name . '.txt';
 
-    // Preserve order and content as provided
-    $content = implode("\n", $entries_array);
-    // Ensure a single trailing newline for POSIX compatibility / cleaner diffs
-    if (!empty($content)) {
-        $content .= "\n";
+    // Generate timestamp comment using UTC for consistency
+    $timestamp_comment = "# Last updated: " . gmdate("Y-m-d H:i:s") . " UTC";
+
+    // Convert actual entries to a string
+    $entries_string = implode("\n", $entries_array);
+
+    // Build the full content: timestamp first, then entries
+    $full_content = $timestamp_comment;
+    // Add entries only if there are any (even if an entry is an empty string)
+    if (count($entries_array) > 0) {
+        $full_content .= "\n" . $entries_string;
     }
 
+    // Ensure a single trailing newline for the whole file for POSIX compatibility / cleaner diffs
+    $full_content .= "\n";
+
     // Use file_put_contents with LOCK_EX for basic concurrency safety
-    // and check if the write was successful
-    if (file_put_contents($file_path, $content, LOCK_EX) === false) {
+    if (file_put_contents($file_path, $full_content, LOCK_EX) === false) {
         error_log("Error: Could not write to list file: " . $file_path);
         return false;
     }
