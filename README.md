@@ -88,7 +88,6 @@ To run this application, you need:
 
 ```
 /path/to/your/webroot/
-└── PFLMT-2/
     ├── index.php
     └── lists/
         ├── listname1.txt
